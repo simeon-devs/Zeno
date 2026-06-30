@@ -7,7 +7,7 @@ export default function MessageThread({ messages }: { messages: Message[] }) {
   }
 
   return (
-    <div className="flex flex-col gap-2 p-4">
+    <div className="flex flex-col gap-3 p-6 bg-zinc-50 min-h-[400px]">
       {messages.map((m) => (
         <MessageBubble key={m.id} message={m} />
       ))}
