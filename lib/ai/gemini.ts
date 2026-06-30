@@ -8,7 +8,7 @@ export async function generateWithTools(
   tools: Tool[]
 ): Promise<{ text: string | null; functionCall: FunctionCall | null }> {
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-1.5-flash-latest",
     tools,
     systemInstruction: systemPrompt,
   })
@@ -24,7 +24,7 @@ export async function generateWithTools(
 }
 
 export async function generateText(prompt: string): Promise<string> {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" })
   const result = await model.generateContent(prompt)
   return result.response.text()
 }
