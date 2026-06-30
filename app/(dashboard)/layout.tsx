@@ -26,13 +26,13 @@ export default async function DashboardLayout({
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">
-          <Link href="/dashboard">
+          <Link href="/">
             <Button variant="ghost" className="w-full justify-start gap-2 font-normal">
               <MessageSquare className="h-4 w-4" />
               Inbox
             </Button>
           </Link>
-          <Link href="/dashboard/settings">
+          <Link href="/settings">
             <Button variant="ghost" className="w-full justify-start gap-2 font-normal">
               <Settings className="h-4 w-4" />
               Settings
