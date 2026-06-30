@@ -42,10 +42,24 @@ interface Props {
 
 export default function ProfileForm({ company }: Props) {
   const [autoReply, setAutoReply] = useState(company.auto_reply_enabled)
+  const [name, setName] = useState(company.name)
+  const [description, setDescription] = useState(company.description)
+  const [tone, setTone] = useState(company.tone)
+  const [responseLength, setResponseLength] = useState(company.response_length)
+  const [language, setLanguage] = useState(company.language)
+  const [fallbackMessage, setFallbackMessage] = useState(company.fallback_message)
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
     setStatus("saving")
+    const formData = new FormData()
+    formData.set("name", name)
+    formData.set("description", description)
+    formData.set("tone", tone)
+    formData.set("response_length", responseLength)
+    formData.set("language", language)
+    formData.set("fallback_message", fallbackMessage)
     formData.set("auto_reply_enabled", String(autoReply))
     const result = await saveProfile(formData)
     setStatus(result.success ? "saved" : "error")
@@ -53,7 +67,7 @@ export default function ProfileForm({ company }: Props) {
   }
 
   return (
-    <form action={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex items-center justify-between py-3 border-b border-zinc-100">
         <div>
           <p className="font-medium text-sm">AI Auto-Reply</p>
@@ -64,7 +78,7 @@ export default function ProfileForm({ company }: Props) {
 
       <div className="space-y-1.5">
         <Label htmlFor="name">Company Name</Label>
-        <Input id="name" name="name" defaultValue={company.name} required />
+        <Input id="name" name="name" value={name} onChange={e => setName(e.target.value)} required />
       </div>
 
       <div className="space-y-1.5">
@@ -72,7 +86,8 @@ export default function ProfileForm({ company }: Props) {
         <Textarea
           id="description"
           name="description"
-          defaultValue={company.description}
+          value={description}
+          onChange={e => setDescription(e.target.value)}
           rows={4}
           placeholder="Describe your business, services, location, and anything the AI should know..."
           required
@@ -84,7 +99,8 @@ export default function ProfileForm({ company }: Props) {
         <select
           id="tone"
           name="tone"
-          defaultValue={company.tone}
+          value={tone}
+          onChange={e => setTone(e.target.value)}
           className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm"
         >
           {tones.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -96,7 +112,8 @@ export default function ProfileForm({ company }: Props) {
         <select
           id="response_length"
           name="response_length"
-          defaultValue={company.response_length}
+          value={responseLength}
+          onChange={e => setResponseLength(e.target.value)}
           className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm"
         >
           {lengths.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
@@ -108,7 +125,8 @@ export default function ProfileForm({ company }: Props) {
         <select
           id="language"
           name="language"
-          defaultValue={company.language}
+          value={language}
+          onChange={e => setLanguage(e.target.value)}
           className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm"
         >
           {languages.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
@@ -120,7 +138,8 @@ export default function ProfileForm({ company }: Props) {
         <Textarea
           id="fallback_message"
           name="fallback_message"
-          defaultValue={company.fallback_message}
+          value={fallbackMessage}
+          onChange={e => setFallbackMessage(e.target.value)}
           rows={2}
           placeholder="Message sent when AI cannot answer confidently..."
         />

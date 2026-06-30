@@ -22,11 +22,17 @@ const whatsappSchema = z.object({
   whatsapp_token: z.string().min(1),
 })
 
-async function getCompanyId(): Promise<string | null> {
+async function getAuthUser() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  return user ?? null
+}
+
+async function getCompanyId(): Promise<string | null> {
+  const user = await getAuthUser()
   if (!user) return null
 
+  const supabase = await createClient()
   const { data } = await supabase
     .from("companies")
     .select("id")
@@ -37,8 +43,8 @@ async function getCompanyId(): Promise<string | null> {
 }
 
 export async function saveProfile(formData: FormData) {
-  const companyId = await getCompanyId()
-  if (!companyId) return { error: "Not authenticated" }
+  const user = await getAuthUser()
+  if (!user) return { error: "Not authenticated" }
 
   const parsed = profileSchema.safeParse({
     name: formData.get("name"),
@@ -55,8 +61,7 @@ export async function saveProfile(formData: FormData) {
   const supabase = createServiceClient()
   const { error } = await supabase
     .from("companies")
-    .update(parsed.data)
-    .eq("id", companyId)
+    .upsert({ ...parsed.data, user_id: user.id }, { onConflict: "user_id" })
 
   if (error) return { error: error.message }
 

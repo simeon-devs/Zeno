@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation"
 import Link from "next/link"
 import { getCompany } from "@/lib/db/companies"
 import { getFaqs } from "@/lib/db/faqs"
@@ -6,11 +5,21 @@ import ProfileForm from "@/components/settings/ProfileForm"
 import FAQEditor from "@/components/settings/FAQEditor"
 import { Separator } from "@/components/ui/separator"
 
+const DEFAULT_COMPANY = {
+  id: null as string | null,
+  name: "",
+  description: "",
+  tone: "professional_friendly",
+  response_length: "medium",
+  language: "auto",
+  fallback_message: "Thank you for reaching out! Our team will get back to you shortly.",
+  auto_reply_enabled: false,
+}
+
 export default async function SettingsPage() {
   const company = await getCompany()
-  if (!company) redirect("/login")
-
-  const faqs = await getFaqs(company.id)
+  const profile = company ?? DEFAULT_COMPANY
+  const faqs = company ? await getFaqs(company.id) : []
 
   return (
     <div className="max-w-2xl mx-auto px-8 py-10 space-y-10">
@@ -35,7 +44,7 @@ export default async function SettingsPage() {
           <h2 className="font-semibold">Business Profile</h2>
           <p className="text-zinc-500 text-xs mt-0.5">This is what the AI knows about your business.</p>
         </div>
-        <ProfileForm company={company} />
+        <ProfileForm company={profile} />
       </section>
 
       <Separator />

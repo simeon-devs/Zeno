@@ -44,12 +44,23 @@ async function processWebhook(payload: WhatsAppWebhookPayload) {
       const contactName = value.contacts?.[0]?.profile?.name ?? null
       const messageBody = message.text.body
 
-      // find which company owns this phone number id
-      const { data: company } = await supabase
+      // find company by phone number id; fall back to env var match (test number)
+      let { data: company } = await supabase
         .from("companies")
         .select("id, auto_reply_enabled, whatsapp_token")
         .eq("whatsapp_phone_id", phoneNumberId)
         .single()
+
+      if (!company && phoneNumberId === process.env.META_PHONE_NUMBER_ID) {
+        // use the first company in the DB (single-tenant demo setup)
+        const { data: fallback } = await supabase
+          .from("companies")
+          .select("id, auto_reply_enabled, whatsapp_token")
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .single()
+        company = fallback
+      }
 
       if (!company) continue
 

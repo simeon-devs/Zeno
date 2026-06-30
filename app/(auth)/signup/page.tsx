@@ -13,7 +13,6 @@ export default function SignupPage() {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [companyName, setCompanyName] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -32,18 +31,7 @@ export default function SignupPage() {
       return
     }
 
-    if (data.user) {
-      const { error: companyError } = await supabase
-        .from("companies")
-        .insert({ user_id: data.user.id, name: companyName, use_demo_data: true })
-
-      if (companyError) {
-        setError(companyError.message)
-        setLoading(false)
-        return
-      }
-    }
-
+    // company row is created by the Postgres trigger on auth.users insert
     router.push("/inbox")
     router.refresh()
   }
@@ -69,17 +57,6 @@ export default function SignupPage() {
                   {error}
                 </p>
               )}
-              <div className="space-y-1.5">
-                <Label htmlFor="company">Company name</Label>
-                <Input
-                  id="company"
-                  type="text"
-                  placeholder="Desert Tours Dubai"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  required
-                />
-              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
                 <Input
