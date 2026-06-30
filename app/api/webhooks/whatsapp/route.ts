@@ -50,26 +50,29 @@ async function processWebhook(payload: WhatsAppWebhookPayload) {
       const messageBody = message.text.body
 
       // find company by phone number id; fall back to first company (demo/test setup)
-      let { data: company } = await supabase
+      let { data: company, error: companyErr } = await supabase
         .from("companies")
         .select("id, auto_reply_enabled, whatsapp_token")
         .eq("whatsapp_phone_id", phoneNumberId)
         .single()
 
+      console.log("[webhook] company by phone_id:", company, companyErr?.message)
+
       if (!company) {
-        const { data: fallback } = await supabase
+        const { data: fallback, error: fallbackErr } = await supabase
           .from("companies")
           .select("id, auto_reply_enabled, whatsapp_token")
           .order("created_at", { ascending: true })
           .limit(1)
           .single()
+        console.log("[webhook] fallback company:", fallback, fallbackErr?.message)
         company = fallback
       }
 
-      if (!company) continue
+      if (!company) { console.log("[webhook] no company found, skipping"); continue }
 
       // find or create the conversation
-      const { data: conversation } = await supabase
+      const { data: conversation, error: convErr } = await supabase
         .from("conversations")
         .upsert(
           { company_id: company.id, contact_phone: contactPhone, contact_name: contactName, last_message_at: new Date().toISOString() },
@@ -78,16 +81,19 @@ async function processWebhook(payload: WhatsAppWebhookPayload) {
         .select("id")
         .single()
 
+      console.log("[webhook] conversation:", conversation, convErr?.message)
+
       if (!conversation) continue
 
       // save inbound message
-      await supabase.from("messages").insert({
+      const { error: msgErr } = await supabase.from("messages").insert({
         conversation_id: conversation.id,
         direction: "inbound",
         body: messageBody,
         sent_by: "customer",
         wa_message_id: message.id,
       })
+      console.log("[webhook] message insert error:", msgErr?.message)
 
       if (!company.auto_reply_enabled) continue
 
