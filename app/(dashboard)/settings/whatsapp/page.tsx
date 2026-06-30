@@ -1,21 +1,9 @@
-"use client"
-
-import { useState } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { saveWhatsApp } from "@/app/(dashboard)/settings/actions"
+import { getCompany } from "@/lib/db/companies"
+import WhatsAppForm from "@/components/settings/WhatsAppForm"
 
-export default function WhatsAppSettingsPage() {
-  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
-
-  async function handleSubmit(formData: FormData) {
-    setStatus("saving")
-    const result = await saveWhatsApp(formData)
-    setStatus(result.success ? "saved" : "error")
-    setTimeout(() => setStatus("idle"), 2000)
-  }
+export default async function WhatsAppSettingsPage() {
+  const company = await getCompany()
 
   return (
     <div className="max-w-2xl mx-auto px-8 py-10 space-y-10">
@@ -40,34 +28,10 @@ export default function WhatsAppSettingsPage() {
             Found in your Meta Developer Console → WhatsApp → Getting Started.
           </p>
         </div>
-
-        <form action={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="whatsapp_phone_id">Phone Number ID</Label>
-            <Input
-              id="whatsapp_phone_id"
-              name="whatsapp_phone_id"
-              placeholder="12147107617722093"
-              defaultValue="12147107617722093"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="whatsapp_token">Access Token</Label>
-            <Input
-              id="whatsapp_token"
-              name="whatsapp_token"
-              type="password"
-              placeholder="EAABxx..."
-            />
-            <p className="text-xs text-zinc-400">
-              Note: the temporary token expires every 24h. Paste a fresh one here when it does.
-            </p>
-          </div>
-          <Button type="submit" disabled={status === "saving"}>
-            {status === "saving" ? "Saving..." : status === "saved" ? "Saved ✓" : "Save credentials"}
-          </Button>
-          {status === "error" && <p className="text-sm text-red-600">Failed to save. Try again.</p>}
-        </form>
+        <WhatsAppForm
+          phoneId={company?.whatsapp_phone_id ?? ""}
+          hasToken={!!company?.whatsapp_token}
+        />
       </section>
     </div>
   )

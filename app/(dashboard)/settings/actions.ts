@@ -19,7 +19,7 @@ const profileSchema = z.object({
 
 const whatsappSchema = z.object({
   whatsapp_phone_id: z.string().min(1),
-  whatsapp_token: z.string().min(1),
+  whatsapp_token: z.string().optional(),
 })
 
 async function getAuthUser() {
@@ -80,10 +80,17 @@ export async function saveWhatsApp(formData: FormData) {
 
   if (!parsed.success) return { error: "Invalid data" }
 
+  const update: Record<string, string> = {
+    whatsapp_phone_id: parsed.data.whatsapp_phone_id,
+  }
+  if (parsed.data.whatsapp_token) {
+    update.whatsapp_token = parsed.data.whatsapp_token
+  }
+
   const supabase = createServiceClient()
   const { error } = await supabase
     .from("companies")
-    .update(parsed.data)
+    .update(update)
     .eq("id", companyId)
 
   if (error) return { error: error.message }
