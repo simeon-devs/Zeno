@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // redirect unauthenticated users away from protected routes
-  const protectedRoutes = ["/", "/conversations", "/settings"]
+  const protectedRoutes = ["/inbox", "/conversations", "/settings"]
   const isProtected = protectedRoutes.some(r => pathname === r || pathname.startsWith(r + "/"))
   if (!user && isProtected) {
     return NextResponse.redirect(new URL("/login", request.url))
@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
 
   // redirect authenticated users away from auth pages
   if (user && (pathname === "/login" || pathname === "/signup")) {
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.redirect(new URL("/inbox", request.url))
   }
 
   return supabaseResponse

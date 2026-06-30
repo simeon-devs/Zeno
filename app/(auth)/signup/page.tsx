@@ -44,7 +44,7 @@ export default function SignupPage() {
       }
     }
 
-    router.push("/")
+    router.push("/inbox")
     router.refresh()
   }
 
