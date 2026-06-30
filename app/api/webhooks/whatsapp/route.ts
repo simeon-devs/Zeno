@@ -20,8 +20,8 @@ export async function POST(request: Request) {
     return new Response("Bad Request", { status: 400 })
   }
 
-  // always return 200 immediately — Meta retries if we take too long
-  processWebhook(payload).catch(console.error)
+  // await processing so Vercel doesn't kill it before it completes
+  await processWebhook(payload).catch(console.error)
 
   return new Response("OK", { status: 200 })
 }
