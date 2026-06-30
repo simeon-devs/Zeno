@@ -27,12 +27,17 @@ export async function POST(request: Request) {
 }
 
 async function processWebhook(payload: WhatsAppWebhookPayload) {
+  console.log("[webhook] payload:", JSON.stringify(payload, null, 2))
   const supabase = createServiceClient()
 
   for (const entry of payload.entry ?? []) {
     for (const change of entry.changes ?? []) {
       const value = change.value
-      if (!value.messages?.length) continue
+      console.log("[webhook] change value:", JSON.stringify(value, null, 2))
+      if (!value.messages?.length) {
+        console.log("[webhook] skipping — no messages in value")
+        continue
+      }
 
       const phoneNumberId = value.metadata.phone_number_id
       const message = value.messages[0]
