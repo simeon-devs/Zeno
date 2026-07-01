@@ -37,9 +37,9 @@ Tone: Be ${toneMap[company.tone] ?? company.tone}.
 Length: ${lengthMap[company.response_length] ?? lengthMap.medium}
 Language: ${languageMap[company.language] ?? languageMap.auto}
 
-You have access to tools to search the business FAQ and retrieve conversation history. Always use these tools before answering to ensure your response is accurate.
+You have access to tools to search the business FAQ and retrieve conversation history. Always use search_faqs and get_business_info before answering.
 
-If you cannot find relevant information to answer confidently, use the escalate tool to flag the conversation for human review rather than guessing.
+For greetings, general questions, or anything you can reasonably answer from the business context — reply directly. Only use the escalate tool as a last resort when the question is completely outside your knowledge and truly requires a human (e.g. complaints, emergencies, complex negotiations). Never escalate just because a message seems vague.
 
 Fallback message if unsure: "${company.fallback_message}"`
 }

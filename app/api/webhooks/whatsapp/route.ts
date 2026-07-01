@@ -106,9 +106,9 @@ async function processWebhook(payload: WhatsAppWebhookPayload) {
 
       if (!reply) continue
 
-      // send reply via Meta API
+      // send reply via Meta API — always use the company's real phone ID, not the incoming one
       const token = company.whatsapp_token ?? process.env.META_ACCESS_TOKEN!
-      const pid = phoneNumberId ?? process.env.META_PHONE_NUMBER_ID!
+      const pid = process.env.META_PHONE_NUMBER_ID!
 
       await sendWhatsAppMessage(contactPhone, reply, pid, token)
 
